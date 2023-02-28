@@ -62,7 +62,7 @@ public class Sql2oBatchRepository {
         String sql2oQuery = query;
         int i = 0;
         while (sql2oQuery.contains("?")) {
-            sql2oQuery = sql2oQuery.replaceFirst("?", ":p" + i);
+            sql2oQuery = sql2oQuery.replaceFirst("\\?", ":p" + i);
             i++;
         }
         queryMap.put(query, sql2oQuery);
