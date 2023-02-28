@@ -56,28 +56,29 @@ public class PersistService {
 	public void persist(String topic, List<String> jsons) {
 
 		Map<String, List<Mapping>> map = topicMap.getTopicMap();
-		Map<Object, List<Mapping>> applicableMappings = new LinkedHashMap<>();
+        Map<Object, List<Mapping>> applicableMappings = new LinkedHashMap<>();
 
-		for (String json : jsons){
-			Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
-			applicableMappings.put(document, filterMappings(map.get(topic), document));
-		}
+		for (String json : jsons) {
+            Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
+            applicableMappings.put(document, filterMappings(map.get(topic), document));
+        }
 
-		applicableMappings.forEach((jsonObj, mappings) -> {
-			for (Mapping mapping : mappings) {
-				List<QueryMap> queryMaps = mapping.getQueryMaps();
-				for (QueryMap queryMap : queryMaps) {
-					String query = queryMap.getQuery();
-					List<JsonMap> jsonMaps = queryMap.getJsonMaps();
-					String basePath = queryMap.getBasePath();
-
-					List<Object[]> rows = new LinkedList<>(persistRepository.getRows(jsonMaps, jsonObj, basePath));
-
-					persistRepository.persist(query, rows);
-				}
-
-			}
-		});
+		Map<String, List<Object[]>> qMap = new LinkedHashMap<>();
+        applicableMappings.forEach((jsonObj, mappings) -> {
+            for (Mapping mapping : mappings) {
+                List<QueryMap> queryMaps = mapping.getQueryMaps();
+                for (QueryMap queryMap : queryMaps) {
+                    String query = queryMap.getQuery();
+                    List<JsonMap> jsonMaps = queryMap.getJsonMaps();
+                    String basePath = queryMap.getBasePath();
+                    List<Object[]> rows = new LinkedList<>(persistRepository.getRows(jsonMaps, jsonObj, basePath));
+                   qMap.computeIfAbsent(query, s -> new LinkedList<>()).addAll(rows);
+                }
+            }
+        });
+		qMap.forEach((s, objects) -> {
+            persistRepository.persist(s,objects);
+        });
 	}
 
 	private List<Mapping> filterMappings(List<Mapping> mappings, Object json){
