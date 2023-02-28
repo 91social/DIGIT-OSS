@@ -23,35 +23,70 @@ public class PersisterBatchListner implements BatchMessageListener<String, Objec
     private ObjectMapper objectMapper;
 
     @Autowired
-    private PersistService persistService;
+    private Sql2oPersistService persistService;
+
+    @Value("${persist.thread.size}")
+    private int threadSize;
+
+    private ExecutorService executorService;
+
+    @PostConstruct
+    public void init() {
+        this.executorService = Executors.newFixedThreadPool(threadSize);
+    }
 
     @Override
     public void onMessage(List<ConsumerRecord<String, Object>> dataList) {
+        List<List<ConsumerRecord<String, Object>>> lists = splitList(dataList);
+        CountDownLatch latch = new CountDownLatch(lists.size());
+        lists.forEach(consumerRecords -> {
+            executorService.submit(() -> {
+                Map<String, List<String>> topicTorcvDataList = new LinkedHashMap<>();
 
-        Map<String,List<String>> topicTorcvDataList = new HashMap<>();
+                consumerRecords.forEach(data -> {
+                    try {
+                        if (!topicTorcvDataList.containsKey(data.topic())) {
+                            List<String> rcvDataList = new LinkedList<>();
+                            rcvDataList.add(objectMapper.writeValueAsString(data.value()));
+                            topicTorcvDataList.put(data.topic(), rcvDataList);
+                        } else {
+                            topicTorcvDataList.get(data.topic()).add(objectMapper.writeValueAsString(data.value()));
+                        }
+                    } catch (JsonProcessingException e) {
+                        log.error("Failed to serialize incoming message", e);
+                    }
+                });
 
-            dataList.forEach(data -> {
-                try {
-                    if(!topicTorcvDataList.containsKey(data.topic())){
-                        List<String> rcvDataList= new LinkedList<>();
-                        rcvDataList.add(objectMapper.writeValueAsString(data.value()));
-                        topicTorcvDataList.put(data.topic(),rcvDataList);
-                    }
-                    else {
-                        topicTorcvDataList.get(data.topic()).add(objectMapper.writeValueAsString(data.value()));
-                    }
+                for (Map.Entry<String, List<String>> entry : topicTorcvDataList.entrySet()) {
+                    persistService.persist(entry.getKey(), entry.getValue());
                 }
-                catch (JsonProcessingException e) {
-                    log.error("Failed to serialize incoming message", e);
-                }
+                latch.countDown();
             });
 
-        for(Map.Entry<String,List<String>> entry : topicTorcvDataList.entrySet()){
-            persistService.persist(entry.getKey(),entry.getValue());
+        });
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
-
-
+    public <T> List<List<T>> splitList(List<T> dataList) {
+        List<List<T>> subLists = new LinkedList<>();
+        if (dataList.size() < 100) {
+            subLists.add(dataList);
+            return subLists;
+        }
+        int partitionSize = dataList.size() / threadSize;
+        AtomicInteger lastIndex = new AtomicInteger();
+        for (int i = 0; i < threadSize; i++) {
+            int index = lastIndex.getAndAdd(partitionSize);
+            if (i == threadSize - 1) {
+                subLists.add(dataList.subList(index, dataList.size()));
+            } else {
+                subLists.add(dataList.subList(index, lastIndex.get() + 1));
+            }
+        }
+        return subLists;
+    }
 }

@@ -1,263 +1,160 @@
 serviceMaps:
- serviceName: User Service
- mappings:
- - version: 1.0
-   name: User
-   description: create UserCompleteDetails in eg_user, eg_user_details and eg_userrole
-   fromTopic: user-save-topic
-   isTransaction : true
-   queryMaps: 
-    - query: INSERT INTO eg_user(id, salutation, locale, username, pwdexpirytime, mobilenumber,emailid, name, gender, aadhaarnumber, type, active, accountlocked,tenantid,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?,?,?,?,?,?);
-      basePath: $.users.*
-      jsonMaps:
-       - jsonPath: $.users.*.id
+  serviceName: User Service
+  mappings:
+    - version: 1.0
+      name: User
+      description: create UserCompleteDetails in eg_user, eg_user_details and eg_userrole
+      fromTopic: user-save-topic
+      isTransaction : true
+      queryMaps:
+        - query: INSERT INTO eg_user(id, salutation, locale, username, password, pwdexpirydate, mobilenumber, emailid, name, gender, aadhaarnumber, type, active, accountlocked, tenantid, createdby, lastmodifiedby, createddate, lastmodifieddate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.users.*
+          jsonMaps:
+            - jsonPath: $.users.*.id
 
-       - jsonPath: $.users.*.salutation
-         
-       - jsonPath: $.users.*.locale
+            - jsonPath: $.users.*.salutation
 
-       - jsonPath: $.users.*.userName
-       
-       - jsonPath: $.users.*.pwdExpiryDate
+            - jsonPath: $.users.*.locale
 
-       - jsonPath: $.users.*.mobileNumber
+            - jsonPath: $.users.*.userName
 
-       - jsonPath: $.users.*.emailId
+            - jsonPath: $.users.*.password
 
-       - jsonPath: $.users.*.name
+            - jsonPath: $.users.*.pwdExpiryDate
 
-       - jsonPath: $.users.*.gender
+            - jsonPath: $.users.*.mobileNumber
 
-       - jsonPath: $.users.*.aadhaarNumber
+            - jsonPath: $.users.*.emailId
 
-       - jsonPath: $.users.*.type
+            - jsonPath: $.users.*.name
 
-       - jsonPath: $.users.*.active
+            - jsonPath: $.users.*.gender
 
-       - jsonPath: $.users.*.accountLocked
+            - jsonPath: $.users.*.aadhaarNumber
 
-       - jsonPath: $.users.*.tenantId
-       
-       - jsonPath: $.users.*.auditDetails.createdBy
-       
-       - jsonPath: $.users.*.auditDetails.lastModifiedBy
-       
-       - jsonPath: $.users.*.auditDetails.createdTime
-       
-       - jsonPath: $.users.*.auditDetails.lastModifiedTime
+            - jsonPath: $.users.*.type
 
-    - query : INSERT INTO eg_user_details(userid, tenantid, firstname, middlename, lastname, dob, altcontactnumber,fathername, husbandname, bloodgroup, pan, photo, identificationmark,signature) VALUES (?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?,?); 
-      basePath: $.users.*.userDetails
-      jsonMaps:
-       - jsonPath: $.users.*.id
+            - jsonPath: $.users.*.active
 
-       - jsonPath: $.users.*.tenantId
-         
-       - jsonPath: $.users.*.userDetails.firstName
+            - jsonPath: $.users.*.accountLocked
 
-       - jsonPath: $.users.*.userDetails.middleName
-       
-       - jsonPath: $.users.*.userDetails.lastname
+            - jsonPath: $.users.*.tenantId
 
-       - jsonPath: $.users.*.userDetails.dob
+            - jsonPath: $.users.*.auditDetails.createdBy
 
-       - jsonPath: $.users.*.userDetails.altContactNumber
+            - jsonPath: $.users.*.auditDetails.lastModifiedBy
 
-       - jsonPath: $.users.*.userDetails.fatherName
+            - jsonPath: $.users.*.auditDetails.createdDate
 
-       - jsonPath: $.users.*.userDetails.husbandName
+            - jsonPath: $.users.*.auditDetails.lastModifiedDate
 
-       - jsonPath: $.users.*.userDetails.bloodGroup
+        - query : INSERT INTO eg_user_details(userid, tenantid, firstname, middlename, lastname, dob, altcontactnumber, bloodgroup, pan, identificationmark, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.users.*.userDetails
+          jsonMaps:
+            - jsonPath: $.users.*.id
 
-       - jsonPath: $.users.*.userDetails.pan
+            - jsonPath: $.users.*.tenantId
 
-       - jsonPath: $.users.*.userDetails.photo
+            - jsonPath: $.users.*.userDetails.firstName
 
-       - jsonPath: $.users.*.userDetails.identificationMark
-       
-       - jsonPath: $.users.*.userDetails.signature
-    
-    - query : INSERT INTO eg_user_address(type, address, city, pincode, userid, tenantid) VALUES (?, ?, ?, ?, ?, ?);
-      basePath: $.users.*.userDetails.addresses.*
-      jsonMaps:
-        - jsonPath: $.users.*.userDetails.addresses.*.addressType   
-      
-        - jsonPath: $.users.*.userDetails.addresses.*.address
+            - jsonPath: $.users.*.userDetails.middleName
 
-        - jsonPath: $.users.*.userDetails.addresses.*.city
-       
-        - jsonPath: $.users.*.userDetails.addresses.*.pinCode
-  
-        - jsonPath: $.users.*.userDetails.addresses.*.userId
+            - jsonPath: $.users.*.userDetails.lastName
 
-        - jsonPath: $.users.*.userDetails.addresses.*.tenantId
+            - jsonPath: $.users.*.userDetails.dob
 
-    - query : INSERT INTO eg_userrole(rolecode, userid, tenantid, lastmodifieddate) VALUES (?, ?, ?, ?);
-      basePath: $.users.*.roles.*
-      jsonMaps:
-        - jsonPath: $.users.*.roles.*.code  
+            - jsonPath: $.users.*.userDetails.altContactNumber
 
-        - jsonPath: $.users.*.roles.*.userId
+            - jsonPath: $.users.*.userDetails.bloodGroup
 
-        - jsonPath: $.users.*.roles.*.tenantId
-    
-        - jsonPath: $.users.*.roles.*.lastModifiedDate
-        
- - version: 1.0
-   name: User
-   description: update UserCompleteDetails in eg_user, eg_user_details and eg_userrole
-   fromTopic: user-update-topic
-   isTransaction : true
-   queryMaps: 
-    - query: UPDATE eg_user SET salutation=?, locale=?,name=?, gender=?, aadhaarnumber=?,type=?, active=?, accountlocked=?,lastmodifiedtime=?, lastmodifiedby=? WHERE username=? and tenantid=?;
+            - jsonPath: $.users.*.userDetails.pan
 
-      basePath: $.users.*
-      jsonMaps:
-       - jsonPath: $.users.*.salutation
-         
-       - jsonPath: $.users.*.locale
+            - jsonPath: $.users.*.userDetails.identificationMark
 
-       - jsonPath: $.users.*.name
+            - jsonPath: $.users.*.userDetails.signature
 
-       - jsonPath: $.users.*.gender
+        - query : INSERT INTO eg_user_address(id, createddate, createdby, type, address, city, pincode, userid, tenantid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.users.*.userDetails.addresses.*
+          jsonMaps:
+            - jsonPath: $.users.*.userDetails.addresses.*.id
 
-       - jsonPath: $.users.*.aadhaarNumber
+            - jsonPath: $.users.*.userDetails.addresses.*.createdDate
 
-       - jsonPath: $.users.*.type
+            - jsonPath: $.users.*.userDetails.addresses.*.createdBy
 
-       - jsonPath: $.users.*.active
+            - jsonPath: $.users.*.userDetails.addresses.*.addressType
 
-       - jsonPath: $.users.*.accountLocked
-      
-       - jsonPath: $.users.*.auditDetails.lastModifiedTime    
-       
-       - jsonPath: $.users.*.auditDetails.lastModifiedBy
-       
-       - jsonPath: $.users.*.userName  
-       
-       - jsonPath: $.users.*.tenantId
+            - jsonPath: $.users.*.userDetails.addresses.*.address
 
-    - query : UPDATE eg_user_details SET firstname=?, middlename=?, lastname=?,dob=?, altcontactnumber=?, fathername=?, husbandname=?, bloodgroup=?, pan=?, photo=?, identificationmark=?, signature=?  WHERE userid=? and tenantid=?; 
-      basePath: $.users.*.userDetails
-      jsonMaps:
-       - jsonPath: $.users.*.userDetails.firstName
+            - jsonPath: $.users.*.userDetails.addresses.*.city
 
-       - jsonPath: $.users.*.userDetails.middleName
-       
-       - jsonPath: $.users.*.userDetails.lastname
+            - jsonPath: $.users.*.userDetails.addresses.*.pinCode
 
-       - jsonPath: $.users.*.userDetails.dob
+            - jsonPath: $.users.*.userDetails.addresses.*.userId
 
-       - jsonPath: $.users.*.userDetails.altContactNumber
+            - jsonPath: $.users.*.userDetails.addresses.*.tenantId
 
-       - jsonPath: $.users.*.userDetails.fatherName
+        - query : INSERT INTO eg_userrole(id, name, code, createdby, userid, tenantid, lastmodifieddate) VALUES (?, ?, ?, ?, ?, ?, ?);
+          basePath: $.users.*.roles.*
+          jsonMaps:
+            - jsonPath: $.users.*.roles.*.id
 
-       - jsonPath: $.users.*.userDetails.husbandName
+            - jsonPath: $.users.*.roles.*.name
 
-       - jsonPath: $.users.*.userDetails.bloodGroup
+            - jsonPath: $.users.*.roles.*.code
 
-       - jsonPath: $.users.*.userDetails.pan
+            - jsonPath: $.users.*.roles.*.createdBy
 
-       - jsonPath: $.users.*.userDetails.photo
+            - jsonPath: $.users.*.roles.*.userId
 
-       - jsonPath: $.users.*.userDetails.identificationMark
-       
-       - jsonPath: $.users.*.userDetails.signature
-       
-       - jsonPath: $.users.*.id
+            - jsonPath: $.users.*.roles.*.tenantId
 
-       - jsonPath: $.users.*.tenantId
-       
-    - query : DELETE FROM eg_user_address WHERE userid=? and tenantid=?;
-      basePath: $.users.*
-      jsonMaps:
-       - jsonPath: $.users.*.id
+            - jsonPath: $.users.*.roles.*.lastModifiedDate
 
-       - jsonPath: $.users.*.tenantId
+    - version: 1.0
+      name: User
+      description: create user otp
+      fromTopic: userotp-save-topic
+      isTransaction : true
+      queryMaps:
+        - query: INSERT INTO eg_user_otp(userid, tenantid, otpnumber, otpidentity, validated, createddate,lastmodifieddate, createdby, lastmodifiedby) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
-    - query : INSERT INTO eg_user_address(type, address, city, pincode, userid, tenantid) VALUES (?, ?, ?, ?, ?, ?);
-      basePath: $.users.*.userDetails.addresses.*
-      jsonMaps:
-        - jsonPath: $.users.*.userDetails.addresses.*.addressType   
-      
-        - jsonPath: $.users.*.userDetails.addresses.*.address
+          basePath: $.otp
+          jsonMaps:
+            - jsonPath: $.otp.userId
 
-        - jsonPath: $.users.*.userDetails.addresses.*.city
-       
-        - jsonPath: $.users.*.userDetails.addresses.*.pinCode
-  
-        - jsonPath: $.users.*.userDetails.addresses.*.userId
+            - jsonPath: $.otp.tenantId
 
-        - jsonPath: $.users.*.userDetails.addresses.*.tenantId
+            - jsonPath: $.otp.otpNumber
 
-    - query : DELETE FROM eg_userrole WHERE userid=? and tenantid=?;
-      basePath: $.users.*
-      jsonMaps:
-       - jsonPath: $.users.*.id
+            - jsonPath: $.otp.mobileNumber
 
-       - jsonPath: $.users.*.tenantId
+            - jsonPath: $.otp.validated
 
-    - query : INSERT INTO eg_userrole(rolecode, userid, tenantid, lastmodifieddate) VALUES (?, ?, ?, ?);
-      basePath: $.users.*.roles.*
-      jsonMaps:
-        - jsonPath: $.users.*.roles.*.code  
+            - jsonPath: $.otp.auditDetails.createdDate
 
-        - jsonPath: $.users.*.roles.*.userId
+            - jsonPath: $.otp.auditDetails.lastModifiedDate
 
-        - jsonPath: $.users.*.roles.*.tenantId
-    
-        - jsonPath: $.users.*.roles.*.lastModifiedDate       
-                                         
- - version: 1.0
-   name: User
-   description: create user otp
-   fromTopic: userotp-save-topic
-   isTransaction : true
-   queryMaps: 
-    - query: INSERT INTO eg_user_otp(userid, tenantid, otpnumber, otpidentity, validated, createdtime,lastmodifiedtime, createdby, lastmodifiedby) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?); 
+            - jsonPath: $.otp.auditDetails.createdBy
 
-      basePath: $.otp
-      jsonMaps:
-       - jsonPath: $.otp.userId
-         
-       - jsonPath: $.otp.tenantId
-       
-       - jsonPath: $.otp.otpNumber
-       
-       - jsonPath: $.otp.mobileNumber
+            - jsonPath: $.otp.auditDetails.lastModifiedBy
 
-       - jsonPath: $.otp.validated
+    - version: 1.0
+      name: User
+      description: update user otp as password
+      fromTopic: userpassword-update-topic
+      isTransaction : true
+      queryMaps:
+        - query: update eg_user set password=?,lastmodifiedby=?,lastmodifieddate=? where tenantid=? and username=?
 
-       - jsonPath: $.otp.auditDetails.createdTime
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.password
 
-       - jsonPath: $.otp.auditDetails.lastModifiedTime
+            - jsonPath: $.auditDetails.lastModifiedBy
 
-       - jsonPath: $.otp.auditDetails.createdBy
+            - jsonPath: $.auditDetails.lastModifiedDate
 
-       - jsonPath: $.otp.auditDetails.lastModifiedBy
-       
- - version: 1.0
-   name: User
-   description: update user otp as password 
-   fromTopic: userpassword-update-topic
-   isTransaction : true
-   queryMaps: 
-    - query: update eg_user set password=?,lastmodifiedby=?,lastmodifiedtime=? where tenantid=? and username=? 
+            - jsonPath: $.tenantId
 
-      basePath: $
-      jsonMaps:
-       - jsonPath: $.password
-         
-       - jsonPath: $.auditDetails.lastModifiedBy
-
-       - jsonPath: $.auditDetails.lastModifiedTime       
-       
-       - jsonPath: $.tenantId
-       
-       - jsonPath: $.userName
-       
-       
-
-        
-        
-        
+            - jsonPath: $.userName
