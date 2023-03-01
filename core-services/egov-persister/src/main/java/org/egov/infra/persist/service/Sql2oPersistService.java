@@ -80,7 +80,7 @@ public class Sql2oPersistService {
             }
         });
         qMap.forEach((s, objects) -> {
-            sql2OBatchRepository.persist(s,objects);
+            sql2oRawRepository.persist(s,objects);
         });
     }
 

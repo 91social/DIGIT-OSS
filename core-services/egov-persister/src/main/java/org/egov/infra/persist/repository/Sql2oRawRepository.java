@@ -57,7 +57,7 @@ public class Sql2oRawRepository {
 
             int i = 0;
             for (int j = 0; j < query.length(); j++) {
-                char c = query.charAt(0);
+                char c = query.charAt(j);
                 if (c != '?') {
                     sb.append(c);
                     continue;
